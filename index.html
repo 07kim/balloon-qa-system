@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>インタラクティブ・バルーン Q&A システム</title>
+  <meta name="description" content="参加者がキャラクターを選択して質問を風船として飛ばし、みんなでタップして成長・裏返して回答を見る体験型Q&Aプラットフォーム">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- アプリヘッダー -->
+  <header class="app-header">
+    <a href="#" class="brand-title" id="app-brand-title">
+      <span class="logo-icon">🎈</span>
+      <span>バルーン Q&A</span>
+    </a>
+    
+    <nav class="tab-nav" aria-label="メインナビゲーション">
+      <button type="button" class="tab-btn active" data-tab="submit" id="btn-tab-submit">
+        <span>✏️ 質問を送る</span>
+      </button>
+      <button type="button" class="tab-btn" data-tab="balloons" id="btn-tab-balloons">
+        <span>🎈 風船を見る</span>
+      </button>
+    </nav>
+
+    <a href="admin.html" class="admin-link" id="link-to-admin">運営管理画面 ⚙️</a>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="container">
+    
+    <!-- タブ1: 質問送信画面 -->
+    <section id="tab-submit" class="tab-content active">
+      <div class="submit-card">
+        <div class="section-heading">
+          <h1>質問を風船にして飛ばそう！</h1>
+          <p>お好きなキャラクターを選んで質問を入力してください。</p>
+        </div>
+
+        <!-- キャラクター選択グループ -->
+        <div class="form-group">
+          <label class="form-label" id="label-char-select">
+            1. キャラクターを選択する <span class="required-badge">必須</span>
+          </label>
+          <div class="character-grid" id="character-grid" aria-labelledby="label-char-select">
+            <!-- JSで10種類のキャラクターが挿入されます -->
+          </div>
+        </div>
+
+        <!-- 質問テキストエリア -->
+        <div class="form-group">
+          <label for="question-input" class="form-label">
+            2. 質問テキストを入力する <span class="required-badge">必須</span>
+          </label>
+          <textarea 
+            id="question-input" 
+            class="question-textarea" 
+            placeholder="例: 今日の一番のおすすめセッションは何ですか？" 
+            maxlength="200"
+            rows="4"></textarea>
+        </div>
+
+        <!-- 送信ボタン -->
+        <button type="button" class="btn-submit" id="submit-btn">
+          <span>風船を飛ばす 🎈</span>
+        </button>
+
+        <!-- メッセージアラート -->
+        <div id="form-alert" class="alert-message" role="alert"></div>
+      </div>
+    </section>
+
+    <!-- タブ2: バルーン表示画面 -->
+    <section id="tab-balloons" class="tab-content">
+      <div class="balloon-header-info">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div class="sync-status">
+            <span class="sync-dot"></span>
+            <span>リアルタイム同期中（<span id="last-sync-time">--:--:--</span>）</span>
+          </div>
+
+          <!-- 「質問を見る」と「回答を見る」のサブタブ切り替えボタン -->
+          <div class="filter-group" style="margin-left: 8px;">
+            <button type="button" class="btn-filter active" data-balloon-filter="all" id="btn-balloon-filter-all">🌈 すべて</button>
+            <button type="button" class="btn-filter" data-balloon-filter="pending" id="btn-balloon-filter-pending">❓ 質問を見る (未回答)</button>
+            <button type="button" class="btn-filter" data-balloon-filter="answered" id="btn-balloon-filter-answered">💡 回答を見る (回答済み)</button>
+          </div>
+        </div>
+
+        <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
+          💡 風船をタップすると裏返って回答が見れます！20回タップで弾けて消滅します✨
+        </div>
+      </div>
+
+      <!-- バルーン浮遊ステージ -->
+      <div id="balloon-stage" class="balloon-stage">
+        
+        <!-- 空状態メッセージ -->
+        <div id="empty-stage-msg" class="empty-stage-msg">
+          <div style="font-size: 3rem;">🎈</div>
+          <p id="empty-stage-text">まだ風船が届いていません。<br>「質問を送る」タブから一番乗りの質問を飛ばしてみましょう！</p>
+        </div>
+
+        <!-- ステージ下部キャラクターラインナップ -->
+        <div class="stage-characters" id="stage-characters">
+          <!-- JSで10キャラクターが下部に並びます -->
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JavaScript参照 -->
+  <script src="js/characters.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

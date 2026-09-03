@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iPad運営管理画面 | インタラクティブ・バルーンQ&A</title>
+  <meta name="description" content="iPad・タブレット最適化 運営用管理パネル - 上半分でキャラクター選択、下半分で回答入力">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- アプリヘッダー -->
+  <header class="app-header">
+    <a href="index.html" class="brand-title" id="admin-brand-link">
+      <span class="logo-icon">🎈</span>
+      <span>バルーン Q&A <span style="font-size:0.85rem; color: var(--primary-color); font-weight:700;">[iPad運営モード]</span></span>
+    </a>
+    
+    <div style="display:flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+      <a href="index.html" class="admin-link" id="link-to-participant">◀ 参加者画面</a>
+      <button type="button" class="btn-filter" id="btn-refresh" style="background:#FFFFFF; font-weight:800;">🔄 更新</button>
+      <button type="button" class="btn-filter" id="btn-open-config">API・GAS設定 ⚙️</button>
+    </div>
+  </header>
+
+  <!-- iPad最適化メインコンテナ -->
+  <main class="container">
+    <div class="ipad-admin-container">
+      
+      <!-- ==========================================================================
+           【上半分】キャラクター選択エリア (横ボタン切替 ◀ ▶)
+           ========================================================================== -->
+      <section class="admin-top-section">
+        <div class="section-title-sm">
+          <span>1. キャラクターを選択する (左右ボタンで切替)</span>
+          <span id="api-status-text" style="text-transform:none; font-size:0.8rem;">接続モード確認中...</span>
+        </div>
+
+        <div class="char-carousel-wrapper">
+          <!-- 前へボタン (◀) -->
+          <button type="button" class="btn-char-nav" id="btn-char-prev" aria-label="前のキャラクター">◀</button>
+
+          <!-- 10キャラクターのスクロール表示トラック -->
+          <div class="char-carousel-track" id="char-carousel-track">
+            <!-- JSで動的生成（「すべて」+ 10種類のキャラクター） -->
+          </div>
+
+          <!-- 次へボタン (▶) -->
+          <button type="button" class="btn-char-nav" id="btn-char-next" aria-label="次のキャラクター">▶</button>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           【下半分】選択キャラクターの質問リスト＆回答入力フォーム
+           ========================================================================== -->
+      <section class="admin-bottom-section">
+        <!-- 選択キャラクターのバナー -->
+        <div class="selected-char-banner" id="selected-char-banner">
+          <div class="banner-left">
+            <div class="banner-char-avatar" id="banner-char-icon">🎈</div>
+            <div class="banner-char-info">
+              <h2 id="banner-char-name">すべてのキャラクター</h2>
+              <p id="banner-char-stats">届いた質問の確認と回答の入力を行えます。</p>
+            </div>
+          </div>
+          
+          <!-- フィルター切り替え -->
+          <div class="filter-group">
+            <button type="button" class="btn-filter active" data-filter="all" id="filter-all">すべて</button>
+            <button type="button" class="btn-filter" data-filter="pending" id="filter-pending">未回答</button>
+            <button type="button" class="btn-filter" data-filter="answered" id="filter-answered">回答済み</button>
+            <button type="button" class="btn-filter" data-filter="popped" id="filter-popped">消滅済み</button>
+          </div>
+        </div>
+
+        <!-- iPad向け質問カードリスト -->
+        <div class="ipad-question-grid" id="ipad-question-grid">
+          <!-- JSで質問カード＆回答テキストエリアが生成されます -->
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- GAS設定モーダル -->
+  <div class="modal-backdrop" id="config-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>API / Google Apps Script (GAS) 設定</h3>
+        <button type="button" class="modal-close" id="btn-close-config">&times;</button>
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
+        Google Apps ScriptでWebアプリとしてデプロイしたURLを設定すると、実際のGoogleスプレッドシートと双方向連動します。URLを空にするとブラウザ内モックモード動作となります。
+      </p>
+
+      <div class="form-group">
+        <label for="gas-url-input" class="form-label">GAS Web App URL</label>
+        <input type="url" id="gas-url-input" class="question-textarea" style="min-height:48px; height:48px;" placeholder="https://script.google.com/macros/s/.../exec">
+      </div>
+
+      <div style="display:flex; justify-content:space-between; gap: 12px; margin-top: 24px;">
+        <button type="button" class="btn-filter" id="btn-reset-mock" style="color: #E03131;">モックデータ初期化</button>
+        <button type="button" class="btn-submit" id="btn-save-config" style="width:auto; padding: 10px 24px;">設定を保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/characters.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

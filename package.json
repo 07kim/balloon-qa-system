@@ -1,0 +1,19 @@
+{
+  "name": "balloon-qa-system",
+  "version": "1.0.0",
+  "description": "インタラクティブ・バルーンQ&Aシステム (ライトモード & iPad運営対応)",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080"
+  },
+  "keywords": [
+    "balloon",
+    "qa-system",
+    "google-apps-script",
+    "google-sheets-db",
+    "vercel",
+    "ipad-ui"
+  ],
+  "author": "",
+  "license": "MIT"
+}

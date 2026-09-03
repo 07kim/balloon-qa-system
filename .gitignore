@@ -1,0 +1,18 @@
+# Node modules & OS generated files
+node_modules/
+.DS_Store
+Thumbs.db
+
+# Gemini / IDE generated files
+.gemini/
+.idea/
+.vscode/
+
+# Local Environment Variables (Never commit secrets)
+.env
+.env.local
+.env.development.local
+.env.production.local
+
+# Vercel folder
+.vercel/
