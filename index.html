@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- アプリヘッダー -->
+  <!-- アプリヘッダー (参加者用: 運営リンクは非表示) -->
   <header class="app-header">
     <a href="#" class="brand-title" id="app-brand-title">
       <span class="logo-icon">🎈</span>
@@ -23,18 +23,16 @@
         <span>🎈 風船を見る</span>
       </button>
     </nav>
-
-    <a href="admin.html" class="admin-link" id="link-to-admin">iPad 運営管理 ⚙️</a>
   </header>
 
   <!-- メインコンテンツ -->
   <main class="container">
     
     <!-- ==========================================================================
-         タブ1: 質問送信画面 (iPad最適化: 中央1体カルーセル ＋ 吹き出し入力フォーム)
+         タブ1: 質問送信画面 (大型キャラクター ＆ 特大質問入力エリア)
          ========================================================================== -->
     <section id="tab-submit" class="tab-content active">
-      <!-- 上部: 中央キャラクターカルーセルステージ -->
+      <!-- 上部: 中央大型キャラクターカルーセルステージ -->
       <div class="ipad-stage-header" id="submit-carousel-stage">
         <!-- 左右矢印ボタン -->
         <button type="button" class="btn-stage-arrow left" id="btn-submit-char-prev" aria-label="前のキャラ">◀</button>
@@ -47,7 +45,7 @@
             <div class="char-slot-name" id="submit-slot-left-name"></div>
           </div>
 
-          <!-- 中央の選択キャラ -->
+          <!-- 中央の選択キャラ (特大) -->
           <div class="char-slot center" id="submit-slot-center">
             <div class="char-slot-icon" id="submit-slot-center-icon"></div>
             <div class="char-slot-name" id="submit-slot-center-name">名前</div>
@@ -61,23 +59,22 @@
         </div>
       </div>
 
-      <!-- 下部: 吹き出し型 質問入力フォーム -->
+      <!-- 下部: 吹き出し型 大型質問入力フォーム -->
       <div class="speech-bubble-wrapper">
         <div class="speech-bubble-tail"></div>
-        <div class="speech-bubble-card" style="min-height: auto; padding: 20px 24px;">
-          <div class="form-group" style="margin-bottom: 12px;">
-            <label for="question-input" class="form-label" style="font-size: 1rem; color: var(--text-main); font-weight:800;">
+        <div class="speech-bubble-card" style="padding: 24px 30px;">
+          <div class="form-group" style="margin-bottom: 16px; flex: 1; display: flex; flex-direction: column;">
+            <label for="question-input" class="form-label" style="font-size: 1.15rem; color: var(--text-main); font-weight:800; margin-bottom: 10px;">
               質問内容を入力してください
             </label>
             <textarea 
               id="question-input" 
-              class="question-textarea" 
-              placeholder="例: 今日の一番のおすすめセッションは何ですか？" 
-              maxlength="200"
-              rows="3"></textarea>
+              class="question-textarea large-input" 
+              placeholder="ここに質問を入力してください（例: 今日の一番のおすすめセッションは何ですか？）" 
+              maxlength="250"></textarea>
           </div>
 
-          <button type="button" class="btn-submit" id="submit-btn" style="height: 52px; font-size: 1.1rem;">
+          <button type="button" class="btn-submit large-btn" id="submit-btn">
             <span>風船を飛ばす 🎈</span>
           </button>
 
@@ -87,7 +84,7 @@
     </section>
 
     <!-- ==========================================================================
-         タブ2: バルーン表示画面 (iPad最適化: 中央キャラ ＋ 放射状浮遊風船)
+         タブ2: バルーン表示画面 (大型中央キャラ ＋ 放射状浮遊風船)
          ========================================================================== -->
     <section id="tab-balloons" class="tab-content">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; flex-wrap:wrap; gap:8px;">
@@ -108,16 +105,16 @@
         <button type="button" class="btn-stage-arrow left" id="btn-user-char-prev" aria-label="前のキャラ">◀</button>
         <button type="button" class="btn-stage-arrow right" id="btn-user-char-next" aria-label="次のキャラ">▶</button>
 
-        <!-- ステージ中央のキャラクター -->
+        <!-- ステージ中央の大型キャラクター -->
         <div class="radial-center-character" id="radial-center-character">
-          <div class="radial-center-avatar" id="radial-char-icon"></div>
+          <div class="radial-center-avatar large-avatar" id="radial-char-icon"></div>
           <span class="radial-center-name" id="radial-char-name">クマさん</span>
         </div>
 
         <!-- 空状態メッセージ -->
         <div id="empty-stage-msg" class="empty-stage-msg" style="display:none; z-index: 5;">
-          <div style="font-size: 2.5rem;">🎈</div>
-          <p id="empty-stage-text" style="font-weight:700; color: var(--text-muted);">このキャラ宛ての風船はまだありません</p>
+          <div style="font-size: 2.8rem;">🎈</div>
+          <p id="empty-stage-text" style="font-weight:700; color: var(--text-muted); font-size: 1.1rem;">このキャラ宛ての風船はまだありません</p>
         </div>
       </div>
     </section>

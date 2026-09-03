@@ -1,5 +1,5 @@
 /* ==========================================================================
-   インタラクティブ・バルーンQ&Aシステム - iPadブラウザ最適化 CSS
+   インタラクティブ・バルーンQ&Aシステム - iPadブラウザ最適化 CSS (大型UI版)
    ========================================================================== */
 
 :root {
@@ -18,9 +18,9 @@
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.14);
 
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
   --radius-pill: 9999px;
   --border-light: #CBD5E1;
 
@@ -52,7 +52,7 @@ html, body {
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-light);
   box-shadow: var(--shadow-sm);
-  padding: 0 16px;
+  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -63,7 +63,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 800;
   color: var(--primary-color);
   text-decoration: none;
@@ -72,24 +72,24 @@ html, body {
 .tab-nav {
   display: flex;
   background: #E2E8F0;
-  padding: 3px;
+  padding: 4px;
   border-radius: var(--radius-pill);
-  gap: 3px;
+  gap: 4px;
 }
 
 .tab-btn {
   border: none;
   background: transparent;
-  padding: 6px 16px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  padding: 8px 20px;
+  font-size: 0.95rem;
+  font-weight: 800;
   color: var(--text-muted);
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .tab-btn.active {
@@ -113,10 +113,10 @@ html, body {
    iPad メインコンテナ (1画面フィット)
    ========================================================================== */
 .container {
-  max-width: 960px;
+  max-width: 980px;
   height: calc(100dvh - 56px);
   margin: 0 auto;
-  padding: 10px 16px 16px 16px;
+  padding: 12px 18px 18px 18px;
   display: flex;
   flex-direction: column;
 }
@@ -138,12 +138,12 @@ html, body {
 }
 
 /* ==========================================================================
-   iPad専用: 中央1体キャラクター ＆ 左右見切れステージ
+   iPad専用: 大型中央キャラクター ＆ 左右見切れステージ
    ========================================================================== */
 .ipad-stage-header {
   position: relative;
   width: 100%;
-  height: 200px;
+  height: 250px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -159,20 +159,20 @@ html, body {
   transform: translateY(-50%);
   background: transparent;
   border: none;
-  font-size: 2.8rem;
+  font-size: 3.4rem;
   color: #2D6A7E;
   cursor: pointer;
   z-index: 30;
-  padding: 10px 24px;
-  transition: transform 0.2s;
+  padding: 10px 20px;
+  transition: transform 0.2s, color 0.2s;
 }
 
 .btn-stage-arrow:active {
-  transform: translateY(-50%) scale(0.9);
+  transform: translateY(-50%) scale(0.88);
 }
 
-.btn-stage-arrow.left { left: 4%; }
-.btn-stage-arrow.right { right: 4%; }
+.btn-stage-arrow.left { left: 2%; }
+.btn-stage-arrow.right { right: 2%; }
 
 /* カルーセルボックス */
 .carousel-characters-box {
@@ -192,6 +192,7 @@ html, body {
   transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
+/* 中央メインキャラ (特大) */
 .char-slot.center {
   left: 50%;
   transform: translateX(-50%) scale(1);
@@ -201,40 +202,46 @@ html, body {
 
 .char-slot.left-side {
   left: 10%;
-  transform: translateX(-50%) scale(0.72);
-  opacity: 0.5;
+  transform: translateX(-50%) scale(0.68);
+  opacity: 0.45;
   z-index: 10;
   cursor: pointer;
 }
 
 .char-slot.right-side {
   left: 90%;
-  transform: translateX(-50%) scale(0.72);
-  opacity: 0.5;
+  transform: translateX(-50%) scale(0.68);
+  opacity: 0.45;
   z-index: 10;
   cursor: pointer;
 }
 
 .char-slot-icon {
-  width: 105px;
-  height: 105px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.1));
 }
 
 .char-slot.center .char-slot-icon {
-  width: 125px;
-  height: 125px;
+  width: 175px;
+  height: 175px;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
 }
 
 .char-slot-name {
-  font-size: 1.1rem;
-  font-weight: 800;
+  font-size: 1.35rem;
+  font-weight: 900;
   color: #1E293B;
   margin-top: 4px;
   text-align: center;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 3px 18px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
 }
 
 /* ==========================================================================
@@ -253,22 +260,22 @@ html, body {
 /* 吹き出しの上向き三角 */
 .speech-bubble-tail {
   position: absolute;
-  top: -20px;
+  top: -22px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
-  border-bottom: 22px solid #FFFFFF;
+  border-left: 22px solid transparent;
+  border-right: 22px solid transparent;
+  border-bottom: 24px solid #FFFFFF;
   z-index: 10;
 }
 
 .speech-bubble-card {
   background: #FFFFFF;
   border-radius: var(--radius-lg);
-  padding: 18px 24px;
-  box-shadow: var(--shadow-md);
+  padding: 22px 28px;
+  box-shadow: var(--shadow-lg);
   flex: 1;
   min-height: 0;
   display: flex;
@@ -286,7 +293,7 @@ html, body {
 }
 
 .bubble-header h3 {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--text-main);
 }
@@ -299,9 +306,9 @@ html, body {
 .btn-filter {
   border: 1px solid var(--border-light);
   background: #F8FAFC;
-  padding: 5px 12px;
+  padding: 6px 14px;
   border-radius: var(--radius-pill);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-muted);
   cursor: pointer;
@@ -313,11 +320,73 @@ html, body {
   border-color: var(--primary-color);
 }
 
-/* 質問＆回答入力カード */
+/* 質問入力用 特大テキストエリア */
+.question-textarea.large-input {
+  width: 100%;
+  flex: 1;
+  min-height: 120px;
+  padding: 16px 20px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.6;
+  font-family: inherit;
+  border: 2.5px solid var(--border-light);
+  border-radius: var(--radius-md);
+  outline: none;
+  resize: vertical;
+  background: #FAFAFA;
+}
+
+.question-textarea.large-input:focus {
+  border-color: var(--primary-color);
+  background: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(45, 106, 126, 0.15);
+}
+
+/* 特大送信ボタン */
+.btn-submit.large-btn {
+  width: 100%;
+  height: 58px;
+  background: var(--primary-color);
+  color: #FFFFFF;
+  border: none;
+  font-size: 1.25rem;
+  font-weight: 900;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-submit.large-btn:active {
+  transform: scale(0.98);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+}
+
+.alert-message {
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  margin-top: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: none;
+}
+
+.alert-message.success { display: block; background: #E6FCF5; color: #0CA678; }
+.alert-message.error { display: block; background: #FFF5F5; color: #F03E3E; }
+
+/* 質問＆回答入力カード (管理画面) */
 .admin-question-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   flex: 1;
   overflow-y: auto;
 }
@@ -326,43 +395,44 @@ html, body {
   background: #F8FAFC;
   border: 1.5px solid var(--border-light);
   border-radius: var(--radius-md);
-  padding: 14px 18px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .item-meta {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-muted);
 }
 
 .item-q-text {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 800;
   color: var(--text-main);
   background: #FFFFFF;
-  padding: 10px 12px;
+  padding: 12px 16px;
   border-radius: var(--radius-sm);
   border-left: 4px solid var(--primary-color);
 }
 
 .item-answer-row {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .item-answer-input {
   flex: 1;
-  padding: 8px 12px;
-  font-size: 0.95rem;
+  padding: 10px 14px;
+  font-size: 1.05rem;
+  font-weight: 600;
   border: 2px solid var(--border-light);
   border-radius: var(--radius-sm);
   outline: none;
-  min-height: 48px;
+  min-height: 52px;
   font-family: inherit;
 }
 
@@ -370,68 +440,16 @@ html, body {
   background: var(--primary-color);
   color: #FFFFFF;
   border: none;
-  padding: 8px 18px;
-  font-size: 0.9rem;
+  padding: 10px 22px;
+  font-size: 1rem;
   font-weight: 800;
   border-radius: var(--radius-sm);
   cursor: pointer;
   white-space: nowrap;
 }
 
-/* 質問入力用テキストエリア */
-.question-textarea {
-  width: 100%;
-  min-height: 90px;
-  padding: 12px 14px;
-  font-size: 1rem;
-  font-family: inherit;
-  border: 2px solid var(--border-light);
-  border-radius: var(--radius-md);
-  outline: none;
-  resize: vertical;
-  background: #FAFAFA;
-}
-
-.question-textarea:focus {
-  border-color: var(--primary-color);
-  background: #FFFFFF;
-}
-
-.btn-submit {
-  width: 100%;
-  background: var(--primary-color);
-  color: #FFFFFF;
-  border: none;
-  padding: 12px 20px;
-  font-size: 1.05rem;
-  font-weight: 800;
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.btn-submit:disabled {
-  opacity: 0.6;
-}
-
-.alert-message {
-  padding: 10px;
-  border-radius: var(--radius-md);
-  margin-top: 10px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  display: none;
-}
-
-.alert-message.success { display: block; background: #E6FCF5; color: #0CA678; }
-.alert-message.error { display: block; background: #FFF5F5; color: #F03E3E; }
-
 /* ==========================================================================
-   参加者画面: 放射状浮遊バルーンステージ
+   参加者画面: 放射状浮遊バルーンステージ (大型中央キャラ)
    ========================================================================== */
 .radial-balloon-stage {
   position: relative;
@@ -458,20 +476,20 @@ html, body {
   pointer-events: none;
 }
 
-.radial-center-avatar {
-  width: 120px;
-  height: 120px;
+.radial-center-avatar.large-avatar {
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   background: #FFFFFF;
-  padding: 6px;
+  padding: 8px;
   box-shadow: var(--shadow-lg);
 }
 
 .radial-center-name {
-  font-size: 1.1rem;
-  font-weight: 800;
+  font-size: 1.25rem;
+  font-weight: 900;
   background: rgba(255, 255, 255, 0.95);
-  padding: 4px 14px;
+  padding: 4px 18px;
   border-radius: var(--radius-pill);
   margin-top: 6px;
   box-shadow: var(--shadow-sm);
@@ -505,7 +523,7 @@ html, body {
   height: 100%;
   backface-visibility: hidden;
   border-radius: 50%;
-  padding: 14px 10px;
+  padding: 16px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -531,7 +549,7 @@ html, body {
 }
 
 .balloon-question-text {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 800;
   line-height: 1.3;
   color: #1A365D;
@@ -548,9 +566,9 @@ html, body {
   right: 8px;
   background: rgba(255, 255, 255, 0.95);
   color: #2D3748;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 800;
-  padding: 1px 6px;
+  padding: 2px 8px;
   border-radius: var(--radius-pill);
 }
 
@@ -562,16 +580,16 @@ html, body {
 }
 
 .balloon-answer-title {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 800;
   color: var(--primary-color);
   margin-bottom: 2px;
 }
 
 .balloon-answer-text {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.35;
   color: #2D3748;
 }
 
@@ -581,11 +599,11 @@ html, body {
 }
 
 /* 5段階の風船サイズ */
-.balloon-size-1 { width: 110px; height: 110px; }
-.balloon-size-2 { width: 135px; height: 135px; }
-.balloon-size-3 { width: 160px; height: 160px; }
-.balloon-size-4 { width: 190px; height: 190px; }
-.balloon-size-5 { width: 220px; height: 220px; }
+.balloon-size-1 { width: 120px; height: 120px; }
+.balloon-size-2 { width: 145px; height: 145px; }
+.balloon-size-3 { width: 170px; height: 170px; }
+.balloon-size-4 { width: 200px; height: 200px; }
+.balloon-size-5 { width: 235px; height: 235px; }
 
 @keyframes floatA {
   0% { transform: translate(0, 0) rotate(0deg); }
