@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>インタラクティブ・バルーン Q&A システム</title>
   <meta name="description" content="参加者がキャラクターを選択して質問を風船として飛ばし、みんなでタップして成長・裏返して回答を見る体験型Q&Aプラットフォーム">
   <link rel="stylesheet" href="css/style.css">
@@ -30,46 +30,67 @@
   <!-- メインコンテンツ -->
   <main class="container">
     
-    <!-- タブ1: 質問送信画面 -->
+    <!-- ==========================================================================
+         タブ1: 質問送信画面 (iPad最適化: 中央1体カルーセル ＋ 吹き出し入力フォーム)
+         ========================================================================== -->
     <section id="tab-submit" class="tab-content active">
-      <div class="submit-card">
-        <div class="section-heading">
-          <h2>質問を風船にして飛ばそう！</h2>
-          <p>お好きなキャラクターを選んで質問を入力してください。</p>
-        </div>
+      <!-- 上部: 中央キャラクターカルーセルステージ -->
+      <div class="ipad-stage-header" id="submit-carousel-stage">
+        <!-- 左右矢印ボタン -->
+        <button type="button" class="btn-stage-arrow left" id="btn-submit-char-prev" aria-label="前のキャラ">◀</button>
+        <button type="button" class="btn-stage-arrow right" id="btn-submit-char-next" aria-label="次のキャラ">▶</button>
 
-        <div class="form-group">
-          <label class="form-label" id="label-char-select">
-            1. キャラクターを選択する <span class="required-badge">必須</span>
-          </label>
-          <div class="character-grid" id="character-grid" aria-labelledby="label-char-select">
-            <!-- JSで10種類のキャラクターが挿入されます -->
+        <div class="carousel-characters-box">
+          <!-- 左の見切れキャラ -->
+          <div class="char-slot left-side" id="submit-slot-left">
+            <div class="char-slot-icon" id="submit-slot-left-icon"></div>
+            <div class="char-slot-name" id="submit-slot-left-name"></div>
+          </div>
+
+          <!-- 中央の選択キャラ -->
+          <div class="char-slot center" id="submit-slot-center">
+            <div class="char-slot-icon" id="submit-slot-center-icon"></div>
+            <div class="char-slot-name" id="submit-slot-center-name">名前</div>
+          </div>
+
+          <!-- 右の見切れキャラ -->
+          <div class="char-slot right-side" id="submit-slot-right">
+            <div class="char-slot-icon" id="submit-slot-right-icon"></div>
+            <div class="char-slot-name" id="submit-slot-right-name"></div>
           </div>
         </div>
+      </div>
 
-        <div class="form-group">
-          <label for="question-input" class="form-label">
-            2. 質問テキストを入力する <span class="required-badge">必須</span>
-          </label>
-          <textarea 
-            id="question-input" 
-            class="question-textarea" 
-            placeholder="例: 今日の一番のおすすめセッションは何ですか？" 
-            maxlength="200"
-            rows="3"></textarea>
+      <!-- 下部: 吹き出し型 質問入力フォーム -->
+      <div class="speech-bubble-wrapper">
+        <div class="speech-bubble-tail"></div>
+        <div class="speech-bubble-card" style="min-height: auto; padding: 20px 24px;">
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label for="question-input" class="form-label" style="font-size: 1rem; color: var(--text-main); font-weight:800;">
+              質問内容を入力してください
+            </label>
+            <textarea 
+              id="question-input" 
+              class="question-textarea" 
+              placeholder="例: 今日の一番のおすすめセッションは何ですか？" 
+              maxlength="200"
+              rows="3"></textarea>
+          </div>
+
+          <button type="button" class="btn-submit" id="submit-btn" style="height: 52px; font-size: 1.1rem;">
+            <span>風船を飛ばす 🎈</span>
+          </button>
+
+          <div id="form-alert" class="alert-message" role="alert"></div>
         </div>
-
-        <button type="button" class="btn-submit" id="submit-btn">
-          <span>風船を飛ばす 🎈</span>
-        </button>
-
-        <div id="form-alert" class="alert-message" role="alert"></div>
       </div>
     </section>
 
-    <!-- タブ2: バルーン表示画面 (中央キャラ＋放射状浮遊風船) -->
+    <!-- ==========================================================================
+         タブ2: バルーン表示画面 (iPad最適化: 中央キャラ ＋ 放射状浮遊風船)
+         ========================================================================== -->
     <section id="tab-balloons" class="tab-content">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; flex-wrap:wrap; gap:8px;">
         <div class="filter-group">
           <button type="button" class="btn-filter active" data-balloon-filter="all" id="btn-balloon-filter-all">🌈 すべて</button>
           <button type="button" class="btn-filter" data-balloon-filter="pending" id="btn-balloon-filter-pending">❓ 質問 (未回答)</button>
@@ -77,14 +98,13 @@
         </div>
 
         <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">
-          同期中 (<span id="last-sync-time">--:--:--</span>) | 💡 風船をタップして回答を表示
+          同期中 (<span id="last-sync-time">--:--:--</span>) | 💡 タップで回答表示
         </div>
       </div>
 
       <!-- 放射状バルーンステージ -->
       <div class="radial-balloon-stage" id="balloon-stage">
-        
-        <!-- 左右切り替えボタン -->
+        <!-- 左右切り替え矢印ボタン -->
         <button type="button" class="btn-stage-arrow left" id="btn-user-char-prev" aria-label="前のキャラ">◀</button>
         <button type="button" class="btn-stage-arrow right" id="btn-user-char-next" aria-label="次のキャラ">▶</button>
 
@@ -99,7 +119,6 @@
           <div style="font-size: 2.5rem;">🎈</div>
           <p id="empty-stage-text" style="font-weight:700; color: var(--text-muted);">このキャラ宛ての風船はまだありません</p>
         </div>
-
       </div>
     </section>
 

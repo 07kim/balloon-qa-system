@@ -59,6 +59,31 @@ document.addEventListener('DOMContentLoaded', () => {
   slotLeft.addEventListener('click', () => navigate(-1));
   slotRight.addEventListener('click', () => navigate(1));
 
+  // iPadタッチスワイプ対応
+  const stageHeader = document.querySelector('.ipad-stage-header');
+  if (stageHeader) {
+    let startX = 0;
+    let startY = 0;
+    stageHeader.addEventListener('touchstart', (e) => {
+      startX = e.changedTouches[0].screenX;
+      startY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    stageHeader.addEventListener('touchend', (e) => {
+      const endX = e.changedTouches[0].screenX;
+      const endY = e.changedTouches[0].screenY;
+      const diffX = endX - startX;
+      const diffY = endY - startY;
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+        if (diffX > 0) {
+          navigate(-1);
+        } else {
+          navigate(1);
+        }
+      }
+    }, { passive: true });
+  }
+
   function navigate(dir) {
     if (dir === -1) {
       selectedCharId = selectedCharId > 1 ? selectedCharId - 1 : CHARACTERS.length;

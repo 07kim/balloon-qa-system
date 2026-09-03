@@ -1,39 +1,50 @@
 /**
  * 参加者画面 (index.html) メインアプリケーションロジック
- * 中央キャラクター ＆ 放射状浮遊風船UI
+ * iPad最適化: 中央1体カルーセル ＆ 吹き出し型質問入力 ＆ 放射状浮遊風船
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // DOM参照
+  // --- DOM参照 ---
   const tabBtns = document.querySelectorAll('.tab-btn');
   const tabContents = document.querySelectorAll('.tab-content');
   
-  // タブ1
-  const charGrid = document.getElementById('character-grid');
+  // タブ1: 質問送信 カルーセル
+  const btnSubmitPrev = document.getElementById('btn-submit-char-prev');
+  const btnSubmitNext = document.getElementById('btn-submit-char-next');
+  const submitSlotLeft = document.getElementById('submit-slot-left');
+  const submitSlotLeftIcon = document.getElementById('submit-slot-left-icon');
+  const submitSlotLeftName = document.getElementById('submit-slot-left-name');
+  const submitSlotCenter = document.getElementById('submit-slot-center');
+  const submitSlotCenterIcon = document.getElementById('submit-slot-center-icon');
+  const submitSlotCenterName = document.getElementById('submit-slot-center-name');
+  const submitSlotRight = document.getElementById('submit-slot-right');
+  const submitSlotRightIcon = document.getElementById('submit-slot-right-icon');
+  const submitSlotRightName = document.getElementById('submit-slot-right-name');
   const questionInput = document.getElementById('question-input');
   const submitBtn = document.getElementById('submit-btn');
   const formAlert = document.getElementById('form-alert');
+  const submitCarouselStage = document.getElementById('submit-carousel-stage');
   
   // タブ2: 放射状バルーンステージ
   const balloonStage = document.getElementById('balloon-stage');
   const radialIcon = document.getElementById('radial-char-icon');
   const radialName = document.getElementById('radial-char-name');
-  const btnPrevChar = document.getElementById('btn-user-char-prev');
-  const btnNextChar = document.getElementById('btn-user-char-next');
+  const btnUserCharPrev = document.getElementById('btn-user-char-prev');
+  const btnUserCharNext = document.getElementById('btn-user-char-next');
   const emptyStageMsg = document.getElementById('empty-stage-msg');
   const emptyStageText = document.getElementById('empty-stage-text');
   const syncTimeSpan = document.getElementById('last-sync-time');
   const balloonFilterBtns = document.querySelectorAll('[data-balloon-filter]');
 
-  // 内部状態
-  let selectedSubmitCharId = 1;
-  let activeDisplayCharId = 1; // 1〜10 (バルーン表示タブで中央に表示するキャラ)
+  // --- 内部状態 ---
+  let selectedSubmitCharId = 1; // 1〜10 (送信画面で選ばれているキャラ)
+  let activeDisplayCharId = 1;  // 1〜10 (風船画面で表示中のキャラ)
   let rawQuestions = [];
   let pollTimer = null;
   let balloonSubFilter = 'all'; // 'all', 'pending', 'answered'
 
   // 1. 初期化
-  renderCharacterSelection();
+  updateSubmitCarouselSlots();
   updateRadialCenterChar();
 
   // 2. メインタブ切替
@@ -55,68 +66,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 3. サブフィルター切替
-  balloonFilterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      balloonFilterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      balloonSubFilter = btn.getAttribute('data-balloon-filter');
-      applyFilterAndRender();
-    });
-  });
+  // ==========================================================================
+  // タブ1: 質問送信画面 カルーセル切替
+  // ==========================================================================
+  btnSubmitPrev.addEventListener('click', () => navigateSubmitChar(-1));
+  btnSubmitNext.addEventListener('click', () => navigateSubmitChar(1));
+  submitSlotLeft.addEventListener('click', () => navigateSubmitChar(-1));
+  submitSlotRight.addEventListener('click', () => navigateSubmitChar(1));
 
-  // 4. キャラクター左右切替ボタン (◀ ▶)
-  btnPrevChar.addEventListener('click', () => {
-    activeDisplayCharId = activeDisplayCharId > 1 ? activeDisplayCharId - 1 : CHARACTERS.length;
-    updateRadialCenterChar();
-    applyFilterAndRender();
-  });
-
-  btnNextChar.addEventListener('click', () => {
-    activeDisplayCharId = activeDisplayCharId < CHARACTERS.length ? activeDisplayCharId + 1 : 1;
-    updateRadialCenterChar();
-    applyFilterAndRender();
-  });
-
-  function updateRadialCenterChar() {
-    const char = getCharacterById(activeDisplayCharId);
-    if (radialIcon && radialName) {
-      radialIcon.innerHTML = char.icon;
-      radialName.textContent = char.name;
+  function navigateSubmitChar(dir) {
+    if (dir === -1) {
+      selectedSubmitCharId = selectedSubmitCharId > 1 ? selectedSubmitCharId - 1 : CHARACTERS.length;
+    } else {
+      selectedSubmitCharId = selectedSubmitCharId < CHARACTERS.length ? selectedSubmitCharId + 1 : 1;
     }
+    updateSubmitCarouselSlots();
   }
 
-  // 5. 質問送信フォーム キャラクター選択
-  function renderCharacterSelection() {
-    charGrid.innerHTML = '';
-    CHARACTERS.forEach(char => {
-      const card = document.createElement('div');
-      card.className = `character-card ${char.id === selectedSubmitCharId ? 'selected' : ''}`;
-      card.setAttribute('data-id', char.id);
-      card.innerHTML = `
-        <div class="character-avatar">${char.icon}</div>
-        <span class="character-name">${char.name}</span>
-      `;
+  function updateSubmitCarouselSlots() {
+    const total = CHARACTERS.length;
+    const prevId = selectedSubmitCharId > 1 ? selectedSubmitCharId - 1 : total;
+    const nextId = selectedSubmitCharId < total ? selectedSubmitCharId + 1 : 1;
 
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        selectedSubmitCharId = char.id;
-        hideAlert();
-      });
+    const prevChar = getCharacterById(prevId);
+    const centerChar = getCharacterById(selectedSubmitCharId);
+    const nextChar = getCharacterById(nextId);
 
-      charGrid.appendChild(card);
-    });
+    submitSlotLeftIcon.innerHTML = prevChar.icon;
+    submitSlotLeftName.textContent = prevChar.name;
+
+    submitSlotCenterIcon.innerHTML = centerChar.icon;
+    submitSlotCenterName.textContent = centerChar.name;
+
+    submitSlotRightIcon.innerHTML = nextChar.icon;
+    submitSlotRightName.textContent = nextChar.name;
   }
 
-  // 6. 質問送信
+  // スワイプ操作 (送信画面)
+  setupSwipe(submitCarouselStage, (dir) => navigateSubmitChar(dir));
+
+  // 質問送信処理
   submitBtn.addEventListener('click', async () => {
     const questionText = questionInput.value.trim();
 
-    if (!selectedSubmitCharId) {
-      showAlert('キャラクターを1つ選択してください！', 'error');
-      return;
-    }
     if (!questionText) {
       showAlert('質問内容を入力してください！', 'error');
       return;
@@ -153,12 +145,43 @@ document.addEventListener('DOMContentLoaded', () => {
     formAlert.className = `alert-message ${type}`;
   }
 
-  function hideAlert() {
-    formAlert.className = 'alert-message';
-    formAlert.textContent = '';
+  // ==========================================================================
+  // タブ2: 放射状バルーンステージ
+  // ==========================================================================
+  btnUserCharPrev.addEventListener('click', () => navigateDisplayChar(-1));
+  btnUserCharNext.addEventListener('click', () => navigateDisplayChar(1));
+
+  function navigateDisplayChar(dir) {
+    if (dir === -1) {
+      activeDisplayCharId = activeDisplayCharId > 1 ? activeDisplayCharId - 1 : CHARACTERS.length;
+    } else {
+      activeDisplayCharId = activeDisplayCharId < CHARACTERS.length ? activeDisplayCharId + 1 : 1;
+    }
+    updateRadialCenterChar();
+    applyFilterAndRender();
   }
 
-  // 7. データ同期
+  function updateRadialCenterChar() {
+    const char = getCharacterById(activeDisplayCharId);
+    if (radialIcon && radialName) {
+      radialIcon.innerHTML = char.icon;
+      radialName.textContent = char.name;
+    }
+  }
+
+  setupSwipe(balloonStage, (dir) => navigateDisplayChar(dir));
+
+  // サブフィルター切替 (すべて / 質問 / 回答を見る)
+  balloonFilterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      balloonFilterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      balloonSubFilter = btn.getAttribute('data-balloon-filter');
+      applyFilterAndRender();
+    });
+  });
+
+  // データ同期
   async function syncBalloons() {
     try {
       rawQuestions = await balloonApi.fetchQuestions();
@@ -185,9 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 8. 放射状風船のフィルタリングと描画
   function applyFilterAndRender() {
-    // 選択中のキャラクター宛て かつ 消滅していない質問
     let valid = rawQuestions.filter(q => Number(q.character) === Number(activeDisplayCharId) && !q.isPopped && Number(q.tapCount || 0) < 20);
 
     if (balloonSubFilter === 'pending') {
@@ -202,7 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderRadialBalloons(questions) {
     if (!balloonStage) return;
 
-    // 既存の風船DOMをクリア
     const oldBalloons = balloonStage.querySelectorAll('.balloon-wrapper');
     oldBalloons.forEach(b => b.remove());
 
@@ -225,11 +245,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const stageWidth = balloonStage.clientWidth || 800;
     const stageHeight = balloonStage.clientHeight || 560;
     
-    // 中央座標
     const centerX = stageWidth / 2;
     const centerY = stageHeight / 2;
 
-    // 半径（画面サイズに合わせて調整）
     const radiusX = Math.min(centerX - 90, 260);
     const radiusY = Math.min(centerY - 80, 190);
 
@@ -239,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const sizeLevel = Math.min(5, Math.floor(tapCount / 4) + 1);
       const sizeClass = `balloon-size-${sizeLevel}`;
 
-      // 円周上の角度
       const angle = (2 * Math.PI / count) * i - Math.PI / 2;
       const posX = centerX + radiusX * Math.cos(angle);
       const posY = centerY + radiusY * Math.sin(angle);
@@ -248,7 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
       wrapper.className = `balloon-wrapper ${sizeClass} float-${(i % 3) + 1}`;
       wrapper.setAttribute('data-id', qId);
 
-      // 初期位置設定 (中央基準でpx配置)
       wrapper.style.left = `${posX}px`;
       wrapper.style.top = `${posY}px`;
       wrapper.style.transform = 'translate(-50%, -50%)';
@@ -258,8 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       wrapper.innerHTML = createBalloonContentHTML(q, tapCount);
-
-      // タップイベント
       wrapper.addEventListener('click', (e) => handleBalloonClick(e, wrapper, q));
 
       balloonStage.appendChild(wrapper);
@@ -287,7 +301,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function handleBalloonClick(e, wrapper, q) {
     const qId = String(q.id);
-
     wrapper.classList.toggle('flipped');
     wrapper.classList.add('balloon-tap-effect');
     setTimeout(() => wrapper.classList.remove('balloon-tap-effect'), 300);
@@ -317,6 +330,34 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error('Tap recording failed:', err);
     }
+  }
+
+  // タッチスワイプ検知ユーティリティ
+  function setupSwipe(element, callback) {
+    if (!element) return;
+    let startX = 0;
+    let startY = 0;
+
+    element.addEventListener('touchstart', (e) => {
+      startX = e.changedTouches[0].screenX;
+      startY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    element.addEventListener('touchend', (e) => {
+      const endX = e.changedTouches[0].screenX;
+      const endY = e.changedTouches[0].screenY;
+      const diffX = endX - startX;
+      const diffY = endY - startY;
+
+      // 横スワイプ判定 (50px以上)
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+        if (diffX > 0) {
+          callback(-1); // 右スワイプ -> 前のキャラ
+        } else {
+          callback(1);  // 左スワイプ -> 次のキャラ
+        }
+      }
+    }, { passive: true });
   }
 
   function escapeHTML(str) {
