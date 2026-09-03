@@ -1,43 +1,45 @@
 /**
  * 参加者画面 (index.html) メインアプリケーションロジック
+ * 中央キャラクター ＆ 放射状浮遊風船UI
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // --- 要素参照 ---
+  // DOM参照
   const tabBtns = document.querySelectorAll('.tab-btn');
   const tabContents = document.querySelectorAll('.tab-content');
   
-  // タブ1: 質問送信
+  // タブ1
   const charGrid = document.getElementById('character-grid');
   const questionInput = document.getElementById('question-input');
   const submitBtn = document.getElementById('submit-btn');
   const formAlert = document.getElementById('form-alert');
   
-  // タブ2: バルーン浮遊表示
+  // タブ2: 放射状バルーンステージ
   const balloonStage = document.getElementById('balloon-stage');
+  const radialIcon = document.getElementById('radial-char-icon');
+  const radialName = document.getElementById('radial-char-name');
+  const btnPrevChar = document.getElementById('btn-user-char-prev');
+  const btnNextChar = document.getElementById('btn-user-char-next');
   const emptyStageMsg = document.getElementById('empty-stage-msg');
   const emptyStageText = document.getElementById('empty-stage-text');
-  const stageCharsContainer = document.getElementById('stage-characters');
   const syncTimeSpan = document.getElementById('last-sync-time');
   const balloonFilterBtns = document.querySelectorAll('[data-balloon-filter]');
-  
-  // --- 内部状態 ---
-  let selectedCharId = null;
+
+  // 内部状態
+  let selectedSubmitCharId = 1;
+  let activeDisplayCharId = 1; // 1〜10 (バルーン表示タブで中央に表示するキャラ)
   let rawQuestions = [];
-  let currentQuestions = [];
   let pollTimer = null;
   let balloonSubFilter = 'all'; // 'all', 'pending', 'answered'
-  const positionsMap = new Map(); // questionId -> { top, left, floatClass }
 
-  // 1. 初期化: キャラクターグリッドの描画
+  // 1. 初期化
   renderCharacterSelection();
-  renderStageCharacters();
+  updateRadialCenterChar();
 
-  // 2. メインタブ切替イベントの登録 (質問を送る / 風船を見る)
+  // 2. メインタブ切替
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const targetTab = btn.getAttribute('data-tab');
-      
       tabBtns.forEach(b => b.classList.remove('active'));
       tabContents.forEach(c => c.classList.remove('active'));
       
@@ -53,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 3. バルーン表示タブ内のサブタブ切替 (すべて / 質問を見る / 回答を見る)
+  // 3. サブフィルター切替
   balloonFilterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       balloonFilterBtns.forEach(b => b.classList.remove('active'));
@@ -63,12 +65,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 4. キャラクター選択UI構築
+  // 4. キャラクター左右切替ボタン (◀ ▶)
+  btnPrevChar.addEventListener('click', () => {
+    activeDisplayCharId = activeDisplayCharId > 1 ? activeDisplayCharId - 1 : CHARACTERS.length;
+    updateRadialCenterChar();
+    applyFilterAndRender();
+  });
+
+  btnNextChar.addEventListener('click', () => {
+    activeDisplayCharId = activeDisplayCharId < CHARACTERS.length ? activeDisplayCharId + 1 : 1;
+    updateRadialCenterChar();
+    applyFilterAndRender();
+  });
+
+  function updateRadialCenterChar() {
+    const char = getCharacterById(activeDisplayCharId);
+    if (radialIcon && radialName) {
+      radialIcon.innerHTML = char.icon;
+      radialName.textContent = char.name;
+    }
+  }
+
+  // 5. 質問送信フォーム キャラクター選択
   function renderCharacterSelection() {
     charGrid.innerHTML = '';
     CHARACTERS.forEach(char => {
       const card = document.createElement('div');
-      card.className = 'character-card';
+      card.className = `character-card ${char.id === selectedSubmitCharId ? 'selected' : ''}`;
       card.setAttribute('data-id', char.id);
       card.innerHTML = `
         <div class="character-avatar">${char.icon}</div>
@@ -78,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
       card.addEventListener('click', () => {
         document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
-        selectedCharId = char.id;
+        selectedSubmitCharId = char.id;
         hideAlert();
       });
 
@@ -86,27 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 5. ステージ下部のキャラクターイラスト配置
-  function renderStageCharacters() {
-    if (!stageCharsContainer) return;
-    stageCharsContainer.innerHTML = '';
-    CHARACTERS.forEach(char => {
-      const item = document.createElement('div');
-      item.className = 'stage-char-item';
-      item.innerHTML = `
-        <div class="stage-char-avatar">${char.icon}</div>
-        <span class="stage-char-name">${char.name}</span>
-      `;
-      stageCharsContainer.appendChild(item);
-    });
-  }
-
-  // 6. 質問送信処理
+  // 6. 質問送信
   submitBtn.addEventListener('click', async () => {
     const questionText = questionInput.value.trim();
 
-    // 未入力ブロック処理
-    if (!selectedCharId) {
+    if (!selectedSubmitCharId) {
       showAlert('キャラクターを1つ選択してください！', 'error');
       return;
     }
@@ -119,16 +126,18 @@ document.addEventListener('DOMContentLoaded', () => {
     submitBtn.innerHTML = '<span>送信中...</span>';
 
     try {
-      const res = await balloonApi.createQuestion(selectedCharId, questionText);
+      const res = await balloonApi.createQuestion(selectedSubmitCharId, questionText);
       if (res && res.status === 'success') {
         showAlert('質問を風船として飛ばしました！🎈', 'success');
         questionInput.value = '';
+        activeDisplayCharId = selectedSubmitCharId;
+        updateRadialCenterChar();
         
         setTimeout(() => {
           document.querySelector('.tab-btn[data-tab="balloons"]').click();
-        }, 1200);
+        }, 1000);
       } else {
-        showAlert('送信に失敗しました。時間をおいて再試行してください。', 'error');
+        showAlert('送信に失敗しました。再試行してください。', 'error');
       }
     } catch (err) {
       console.error(err);
@@ -149,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
     formAlert.textContent = '';
   }
 
-  // 7. バルーンデータ取得・リアルタイム同期
+  // 7. データ同期
   async function syncBalloons() {
     try {
       rawQuestions = await balloonApi.fetchQuestions();
@@ -164,22 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function applyFilterAndRender() {
-    // 消滅(20タップ)していない風船が対象
-    let validQuestions = rawQuestions.filter(q => !q.isPopped && Number(q.tapCount || 0) < 20);
-
-    if (balloonSubFilter === 'pending') {
-      // 質問を見る (未回答のみ)
-      validQuestions = validQuestions.filter(q => !q.answer);
-    } else if (balloonSubFilter === 'answered') {
-      // 回答を見る (回答済みのみ)
-      validQuestions = validQuestions.filter(q => !!q.answer);
-    }
-
-    currentQuestions = validQuestions;
-    renderBalloons(currentQuestions);
-  }
-
   function startPolling() {
     stopPolling();
     pollTimer = setInterval(syncBalloons, 4000);
@@ -192,138 +185,113 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 8. バルーンの描画＆位置・アニメーション制御
-  function renderBalloons(questions) {
+  // 8. 放射状風船のフィルタリングと描画
+  function applyFilterAndRender() {
+    // 選択中のキャラクター宛て かつ 消滅していない質問
+    let valid = rawQuestions.filter(q => Number(q.character) === Number(activeDisplayCharId) && !q.isPopped && Number(q.tapCount || 0) < 20);
+
+    if (balloonSubFilter === 'pending') {
+      valid = valid.filter(q => !q.answer);
+    } else if (balloonSubFilter === 'answered') {
+      valid = valid.filter(q => !!q.answer);
+    }
+
+    renderRadialBalloons(valid);
+  }
+
+  function renderRadialBalloons(questions) {
     if (!balloonStage) return;
+
+    // 既存の風船DOMをクリア
+    const oldBalloons = balloonStage.querySelectorAll('.balloon-wrapper');
+    oldBalloons.forEach(b => b.remove());
 
     if (questions.length === 0) {
       emptyStageMsg.style.display = 'block';
+      const char = getCharacterById(activeDisplayCharId);
       if (balloonSubFilter === 'pending') {
-        emptyStageText.innerHTML = '現在、未回答の質問風船はありません。<br>新しく質問を送信してみましょう！';
+        emptyStageText.innerHTML = `${char.name} 宛ての未回答質問はありません。`;
       } else if (balloonSubFilter === 'answered') {
-        emptyStageText.innerHTML = 'まだ運営からの回答がある風船はありません。<br>回答が入力されるとここに表示されます！';
+        emptyStageText.innerHTML = `${char.name} 宛ての回答済み風船はまだありません。`;
       } else {
-        emptyStageText.innerHTML = 'まだ風船が届いていません。<br>「質問を送る」タブから一番乗りの質問を飛ばしてみましょう！';
+        emptyStageText.innerHTML = `${char.name} 宛ての風船はまだ届いていません。<br>「質問を送る」から飛ばしてみましょう！`;
       }
+      return;
     } else {
       emptyStageMsg.style.display = 'none';
     }
 
-    // 画面外に消えた風船DOMを削除
-    const existingElements = Array.from(balloonStage.querySelectorAll('.balloon-wrapper'));
-    const currentIds = new Set(questions.map(q => String(q.id)));
+    const count = questions.length;
+    const stageWidth = balloonStage.clientWidth || 800;
+    const stageHeight = balloonStage.clientHeight || 560;
+    
+    // 中央座標
+    const centerX = stageWidth / 2;
+    const centerY = stageHeight / 2;
 
-    existingElements.forEach(el => {
-      const qId = el.getAttribute('data-id');
-      if (!currentIds.has(qId)) {
-        el.classList.add('balloon-popping');
-        setTimeout(() => el.remove(), 600);
-      }
-    });
+    // 半径（画面サイズに合わせて調整）
+    const radiusX = Math.min(centerX - 90, 260);
+    const radiusY = Math.min(centerY - 80, 190);
 
-    // 各質問の風船を作成・更新
-    questions.forEach((q, index) => {
+    questions.forEach((q, i) => {
       const qId = String(q.id);
-      let wrapper = balloonStage.querySelector(`.balloon-wrapper[data-id="${qId}"]`);
-      const char = getCharacterById(q.character);
       const tapCount = Number(q.tapCount || 0);
-
-      // サイズ計算: 20回を5段階に分ける（約4回ごとに1段階UP）
       const sizeLevel = Math.min(5, Math.floor(tapCount / 4) + 1);
       const sizeClass = `balloon-size-${sizeLevel}`;
 
-      if (!wrapper) {
-        // 新規作成
-        wrapper = document.createElement('div');
-        wrapper.className = `balloon-wrapper ${sizeClass}`;
-        wrapper.setAttribute('data-id', qId);
+      // 円周上の角度
+      const angle = (2 * Math.PI / count) * i - Math.PI / 2;
+      const posX = centerX + radiusX * Math.cos(angle);
+      const posY = centerY + radiusY * Math.sin(angle);
 
-        // 「回答を見る」タブ選択時は最初から裏返して回答を見せる
-        if (balloonSubFilter === 'answered' && q.answer) {
-          wrapper.classList.add('flipped');
-        }
+      const wrapper = document.createElement('div');
+      wrapper.className = `balloon-wrapper ${sizeClass} float-${(i % 3) + 1}`;
+      wrapper.setAttribute('data-id', qId);
 
-        // ランダム浮遊位置設定
-        let pos = positionsMap.get(qId);
-        if (!pos) {
-          const topPct = 12 + Math.floor(Math.random() * 55);
-          const leftPct = 8 + Math.floor(Math.random() * 74);
-          const floatAnimClass = `float-${(index % 3) + 1}`;
-          pos = { top: topPct, left: leftPct, floatClass: floatAnimClass };
-          positionsMap.set(qId, pos);
-        }
+      // 初期位置設定 (中央基準でpx配置)
+      wrapper.style.left = `${posX}px`;
+      wrapper.style.top = `${posY}px`;
+      wrapper.style.transform = 'translate(-50%, -50%)';
 
-        wrapper.style.top = `${pos.top}%`;
-        wrapper.style.left = `${pos.left}%`;
-        wrapper.classList.add(pos.floatClass);
-
-        wrapper.innerHTML = createBalloonContentHTML(q, char, tapCount);
-
-        // タップハンドラ
-        wrapper.addEventListener('click', (e) => handleBalloonClick(e, wrapper, q));
-
-        balloonStage.appendChild(wrapper);
-      } else {
-        // 既存風船の更新
-        for (let i = 1; i <= 5; i++) {
-          wrapper.classList.remove(`balloon-size-${i}`);
-        }
-        wrapper.classList.add(sizeClass);
-        updateBalloonInnerHTML(wrapper, q, char, tapCount);
+      if (balloonSubFilter === 'answered' && q.answer) {
+        wrapper.classList.add('flipped');
       }
+
+      wrapper.innerHTML = createBalloonContentHTML(q, tapCount);
+
+      // タップイベント
+      wrapper.addEventListener('click', (e) => handleBalloonClick(e, wrapper, q));
+
+      balloonStage.appendChild(wrapper);
     });
   }
 
-  function createBalloonContentHTML(q, char, tapCount) {
+  function createBalloonContentHTML(q, tapCount) {
     return `
       <div class="balloon-card">
         <!-- 表面 (質問) -->
-        <div class="balloon-face balloon-front" style="background-color: ${char.balloonColor}; border-color: ${char.color};">
-          <div class="balloon-tap-badge">タップ: ${tapCount}/20</div>
-          <div class="balloon-char-icon">${char.icon}</div>
+        <div class="balloon-face balloon-front">
+          <div class="balloon-tap-badge">${tapCount}/20</div>
           <div class="balloon-question-text">${escapeHTML(q.question)}</div>
-          <div class="balloon-knot" style="color: ${char.color}"></div>
-          <div class="balloon-string"></div>
+          <div class="balloon-knot"></div>
         </div>
         <!-- 裏面 (回答) -->
         <div class="balloon-face balloon-back">
           <div class="balloon-answer-title">運営からの回答</div>
           <div class="balloon-answer-text ${!q.answer ? 'waiting' : ''}">${q.answer ? escapeHTML(q.answer) : '回答待ち...'}</div>
-          <div class="balloon-knot" style="color: var(--primary-color)"></div>
-          <div class="balloon-string"></div>
+          <div class="balloon-knot" style="border-bottom-color: var(--primary-color)"></div>
         </div>
       </div>
     `;
   }
 
-  function updateBalloonInnerHTML(wrapper, q, char, tapCount) {
-    const badge = wrapper.querySelector('.balloon-tap-badge');
-    if (badge) badge.textContent = `タップ: ${tapCount}/20`;
-
-    const answerElem = wrapper.querySelector('.balloon-answer-text');
-    if (answerElem) {
-      if (q.answer) {
-        answerElem.textContent = q.answer;
-        answerElem.classList.remove('waiting');
-      } else {
-        answerElem.textContent = '回答待ち...';
-        answerElem.classList.add('waiting');
-      }
-    }
-  }
-
-  // タップ処理
   async function handleBalloonClick(e, wrapper, q) {
     const qId = String(q.id);
 
-    // フリップ切り替え
     wrapper.classList.toggle('flipped');
-
-    // タップ時バウンス
     wrapper.classList.add('balloon-tap-effect');
     setTimeout(() => wrapper.classList.remove('balloon-tap-effect'), 300);
 
-    // カウントアップ通信
     try {
       const result = await balloonApi.recordTap(qId);
       if (result && result.status === 'success' && result.data) {
@@ -331,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
         q.tapCount = updatedCount;
 
         const badge = wrapper.querySelector('.balloon-tap-badge');
-        if (badge) badge.textContent = `タップ: ${updatedCount}/20`;
+        if (badge) badge.textContent = `${updatedCount}/20`;
 
         const sizeLevel = Math.min(5, Math.floor(updatedCount / 4) + 1);
         for (let i = 1; i <= 5; i++) {
@@ -343,7 +311,6 @@ document.addEventListener('DOMContentLoaded', () => {
           wrapper.classList.add('balloon-popping');
           setTimeout(() => {
             wrapper.remove();
-            positionsMap.delete(qId);
           }, 600);
         }
       }
@@ -360,10 +327,5 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
-  }
-
-  if (document.getElementById('tab-balloons').classList.contains('active')) {
-    syncBalloons();
-    startPolling();
   }
 });

@@ -36,9 +36,11 @@ const INITIAL_MOCK_DATA = [
   }
 ];
 
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzLdDdL_LUabibXXWJOe7Iq0hUF-3MCSugR2zIWuKzFqJF4K2_zfMOBuGOS0Jz3wWBV/exec';
+
 class BalloonApi {
   constructor() {
-    this.gasUrl = localStorage.getItem(STORAGE_KEY_GAS_URL) || '';
+    this.gasUrl = localStorage.getItem(STORAGE_KEY_GAS_URL) || DEFAULT_GAS_URL;
     this.initMockDataIfNeeded();
   }
 

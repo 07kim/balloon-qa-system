@@ -24,7 +24,7 @@
       </button>
     </nav>
 
-    <a href="admin.html" class="admin-link" id="link-to-admin">運営管理画面 ⚙️</a>
+    <a href="admin.html" class="admin-link" id="link-to-admin">iPad 運営管理 ⚙️</a>
   </header>
 
   <!-- メインコンテンツ -->
@@ -34,11 +34,10 @@
     <section id="tab-submit" class="tab-content active">
       <div class="submit-card">
         <div class="section-heading">
-          <h1>質問を風船にして飛ばそう！</h1>
+          <h2>質問を風船にして飛ばそう！</h2>
           <p>お好きなキャラクターを選んで質問を入力してください。</p>
         </div>
 
-        <!-- キャラクター選択グループ -->
         <div class="form-group">
           <label class="form-label" id="label-char-select">
             1. キャラクターを選択する <span class="required-badge">必須</span>
@@ -48,7 +47,6 @@
           </div>
         </div>
 
-        <!-- 質問テキストエリア -->
         <div class="form-group">
           <label for="question-input" class="form-label">
             2. 質問テキストを入力する <span class="required-badge">必須</span>
@@ -58,53 +56,48 @@
             class="question-textarea" 
             placeholder="例: 今日の一番のおすすめセッションは何ですか？" 
             maxlength="200"
-            rows="4"></textarea>
+            rows="3"></textarea>
         </div>
 
-        <!-- 送信ボタン -->
         <button type="button" class="btn-submit" id="submit-btn">
           <span>風船を飛ばす 🎈</span>
         </button>
 
-        <!-- メッセージアラート -->
         <div id="form-alert" class="alert-message" role="alert"></div>
       </div>
     </section>
 
-    <!-- タブ2: バルーン表示画面 -->
+    <!-- タブ2: バルーン表示画面 (中央キャラ＋放射状浮遊風船) -->
     <section id="tab-balloons" class="tab-content">
-      <div class="balloon-header-info">
-        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-          <div class="sync-status">
-            <span class="sync-dot"></span>
-            <span>リアルタイム同期中（<span id="last-sync-time">--:--:--</span>）</span>
-          </div>
-
-          <!-- 「質問を見る」と「回答を見る」のサブタブ切り替えボタン -->
-          <div class="filter-group" style="margin-left: 8px;">
-            <button type="button" class="btn-filter active" data-balloon-filter="all" id="btn-balloon-filter-all">🌈 すべて</button>
-            <button type="button" class="btn-filter" data-balloon-filter="pending" id="btn-balloon-filter-pending">❓ 質問を見る (未回答)</button>
-            <button type="button" class="btn-filter" data-balloon-filter="answered" id="btn-balloon-filter-answered">💡 回答を見る (回答済み)</button>
-          </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; flex-wrap:wrap; gap:10px;">
+        <div class="filter-group">
+          <button type="button" class="btn-filter active" data-balloon-filter="all" id="btn-balloon-filter-all">🌈 すべて</button>
+          <button type="button" class="btn-filter" data-balloon-filter="pending" id="btn-balloon-filter-pending">❓ 質問 (未回答)</button>
+          <button type="button" class="btn-filter" data-balloon-filter="answered" id="btn-balloon-filter-answered">💡 回答を見る</button>
         </div>
 
-        <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
-          💡 風船をタップすると裏返って回答が見れます！20回タップで弾けて消滅します✨
+        <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">
+          同期中 (<span id="last-sync-time">--:--:--</span>) | 💡 風船をタップして回答を表示
         </div>
       </div>
 
-      <!-- バルーン浮遊ステージ -->
-      <div id="balloon-stage" class="balloon-stage">
+      <!-- 放射状バルーンステージ -->
+      <div class="radial-balloon-stage" id="balloon-stage">
         
-        <!-- 空状態メッセージ -->
-        <div id="empty-stage-msg" class="empty-stage-msg">
-          <div style="font-size: 3rem;">🎈</div>
-          <p id="empty-stage-text">まだ風船が届いていません。<br>「質問を送る」タブから一番乗りの質問を飛ばしてみましょう！</p>
+        <!-- 左右切り替えボタン -->
+        <button type="button" class="btn-stage-arrow left" id="btn-user-char-prev" aria-label="前のキャラ">◀</button>
+        <button type="button" class="btn-stage-arrow right" id="btn-user-char-next" aria-label="次のキャラ">▶</button>
+
+        <!-- ステージ中央のキャラクター -->
+        <div class="radial-center-character" id="radial-center-character">
+          <div class="radial-center-avatar" id="radial-char-icon"></div>
+          <span class="radial-center-name" id="radial-char-name">クマさん</span>
         </div>
 
-        <!-- ステージ下部キャラクターラインナップ -->
-        <div class="stage-characters" id="stage-characters">
-          <!-- JSで10キャラクターが下部に並びます -->
+        <!-- 空状態メッセージ -->
+        <div id="empty-stage-msg" class="empty-stage-msg" style="display:none; z-index: 5;">
+          <div style="font-size: 2.5rem;">🎈</div>
+          <p id="empty-stage-text" style="font-weight:700; color: var(--text-muted);">このキャラ宛ての風船はまだありません</p>
         </div>
 
       </div>
@@ -112,7 +105,6 @@
 
   </main>
 
-  <!-- JavaScript参照 -->
   <script src="js/characters.js"></script>
   <script src="js/api.js"></script>
   <script src="js/app.js"></script>

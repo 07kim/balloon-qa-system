@@ -3,93 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iPad運営管理画面 | インタラクティブ・バルーンQ&A</title>
-  <meta name="description" content="iPad・タブレット最適化 運営用管理パネル - 上半分でキャラクター選択、下半分で回答入力">
+  <title>iPad 運営管理画面 | インタラクティブ・バルーンQ&A</title>
+  <meta name="description" content="iPad専用 運営用管理パネル - 中央キャラクター切り替え＆吹き出し回答入力">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-  <!-- アプリヘッダー -->
+<body style="background-color: #CBD5E1;">
+  <!-- ヘッダー -->
   <header class="app-header">
     <a href="index.html" class="brand-title" id="admin-brand-link">
       <span class="logo-icon">🎈</span>
-      <span>バルーン Q&A <span style="font-size:0.85rem; color: var(--primary-color); font-weight:700;">[iPad運営モード]</span></span>
+      <span>バルーン Q&A <span style="font-size:0.85rem; color: var(--primary-color); font-weight:800;">[iPad 運営モード]</span></span>
     </a>
     
     <div style="display:flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-      <a href="index.html" class="admin-link" id="link-to-participant">◀ 参加者画面</a>
+      <a href="index.html" class="admin-link">◀ 参加者画面</a>
       <button type="button" class="btn-filter" id="btn-refresh" style="background:#FFFFFF; font-weight:800;">🔄 更新</button>
-      <button type="button" class="btn-filter" id="btn-open-config">API・GAS設定 ⚙️</button>
+      <button type="button" class="btn-filter" id="btn-open-config">API設定 ⚙️</button>
     </div>
   </header>
 
-  <!-- iPad最適化メインコンテナ -->
   <main class="container">
-    <div class="ipad-admin-container">
-      
-      <!-- ==========================================================================
-           【上半分】キャラクター選択エリア (横ボタン切替 ◀ ▶)
-           ========================================================================== -->
-      <section class="admin-top-section">
-        <div class="section-title-sm">
-          <span>1. キャラクターを選択する (左右ボタンで切替)</span>
-          <span id="api-status-text" style="text-transform:none; font-size:0.8rem;">接続モード確認中...</span>
+    
+    <!-- ==========================================================================
+         【上半分】中央1体 ＋ 左右見切れキャラクター ステージ (画像1デザイン)
+         ========================================================================== -->
+    <div class="ipad-stage-header">
+      <!-- 左右矢印ボタン -->
+      <button type="button" class="btn-stage-arrow left" id="btn-admin-prev" aria-label="前のキャラ">◀</button>
+      <button type="button" class="btn-stage-arrow right" id="btn-admin-next" aria-label="次のキャラ">▶</button>
+
+      <!-- 3体カルーセルスライダー -->
+      <div class="carousel-characters-box">
+        <!-- 左の見切れキャラ -->
+        <div class="char-slot left-side" id="slot-left">
+          <div class="char-slot-icon" id="slot-left-icon"></div>
+          <div class="char-slot-name" id="slot-left-name"></div>
         </div>
 
-        <div class="char-carousel-wrapper">
-          <!-- 前へボタン (◀) -->
-          <button type="button" class="btn-char-nav" id="btn-char-prev" aria-label="前のキャラクター">◀</button>
-
-          <!-- 10キャラクターのスクロール表示トラック -->
-          <div class="char-carousel-track" id="char-carousel-track">
-            <!-- JSで動的生成（「すべて」+ 10種類のキャラクター） -->
-          </div>
-
-          <!-- 次へボタン (▶) -->
-          <button type="button" class="btn-char-nav" id="btn-char-next" aria-label="次のキャラクター">▶</button>
-        </div>
-      </section>
-
-      <!-- ==========================================================================
-           【下半分】選択キャラクターの質問リスト＆回答入力フォーム
-           ========================================================================== -->
-      <section class="admin-bottom-section">
-        <!-- 選択キャラクターのバナー -->
-        <div class="selected-char-banner" id="selected-char-banner">
-          <div class="banner-left">
-            <div class="banner-char-avatar" id="banner-char-icon">🎈</div>
-            <div class="banner-char-info">
-              <h2 id="banner-char-name">すべてのキャラクター</h2>
-              <p id="banner-char-stats">届いた質問の確認と回答の入力を行えます。</p>
-            </div>
-          </div>
-          
-          <!-- フィルター切り替え -->
-          <div class="filter-group">
-            <button type="button" class="btn-filter active" data-filter="all" id="filter-all">すべて</button>
-            <button type="button" class="btn-filter" data-filter="pending" id="filter-pending">未回答</button>
-            <button type="button" class="btn-filter" data-filter="answered" id="filter-answered">回答済み</button>
-            <button type="button" class="btn-filter" data-filter="popped" id="filter-popped">消滅済み</button>
-          </div>
+        <!-- 中央の選択キャラ -->
+        <div class="char-slot center" id="slot-center">
+          <div class="char-slot-icon" id="slot-center-icon"></div>
+          <div class="char-slot-name" id="slot-center-name">名前</div>
         </div>
 
-        <!-- iPad向け質問カードリスト -->
-        <div class="ipad-question-grid" id="ipad-question-grid">
-          <!-- JSで質問カード＆回答テキストエリアが生成されます -->
+        <!-- 右の見切れキャラ -->
+        <div class="char-slot right-side" id="slot-right">
+          <div class="char-slot-icon" id="slot-right-icon"></div>
+          <div class="char-slot-name" id="slot-right-name"></div>
         </div>
-      </section>
-
+      </div>
     </div>
+
+    <!-- ==========================================================================
+         【下半分】吹き出し型 回答入力エリア (画像1デザイン)
+         ========================================================================== -->
+    <div class="speech-bubble-wrapper">
+      <!-- 吹き出しの上向き三角 -->
+      <div class="speech-bubble-tail"></div>
+
+      <!-- 吹き出し本体カード -->
+      <div class="speech-bubble-card">
+        
+        <div class="bubble-header">
+          <h3 id="bubble-char-title">クマさん 宛ての質問一覧</h3>
+          <div class="filter-group">
+            <button type="button" class="btn-filter active" data-admin-filter="all" id="filter-all">すべて</button>
+            <button type="button" class="btn-filter" data-admin-filter="pending" id="filter-pending">未回答</button>
+            <button type="button" class="btn-filter" data-admin-filter="answered" id="filter-answered">回答済み</button>
+          </div>
+        </div>
+
+        <!-- 質問＆回答入力リスト -->
+        <div class="admin-question-list" id="admin-question-list">
+          <!-- JSで質問カード＆回答textareaが生成されます -->
+        </div>
+
+      </div>
+    </div>
+
   </main>
 
   <!-- GAS設定モーダル -->
   <div class="modal-backdrop" id="config-modal">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>API / Google Apps Script (GAS) 設定</h3>
+        <h3>Google Apps Script (GAS) 設定</h3>
         <button type="button" class="modal-close" id="btn-close-config">&times;</button>
       </div>
-      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
-        Google Apps ScriptでWebアプリとしてデプロイしたURLを設定すると、実際のGoogleスプレッドシートと双方向連動します。URLを空にするとブラウザ内モックモード動作となります。
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px;">
+        Googleスプレッドシートと連携するGAS Web App URLです。
       </p>
 
       <div class="form-group">
@@ -97,9 +99,9 @@
         <input type="url" id="gas-url-input" class="question-textarea" style="min-height:48px; height:48px;" placeholder="https://script.google.com/macros/s/.../exec">
       </div>
 
-      <div style="display:flex; justify-content:space-between; gap: 12px; margin-top: 24px;">
+      <div style="display:flex; justify-content:space-between; gap: 10px; margin-top: 20px;">
         <button type="button" class="btn-filter" id="btn-reset-mock" style="color: #E03131;">モックデータ初期化</button>
-        <button type="button" class="btn-submit" id="btn-save-config" style="width:auto; padding: 10px 24px;">設定を保存</button>
+        <button type="button" class="btn-submit" id="btn-save-config" style="width:auto; padding: 8px 20px;">設定を保存</button>
       </div>
     </div>
   </div>
