@@ -67,7 +67,11 @@ class BalloonApi {
   async fetchQuestions() {
     if (this.gasUrl) {
       try {
-        const response = await fetch(this.gasUrl, { method: 'GET' });
+        const response = await fetch(this.gasUrl, {
+          method: 'GET',
+          mode: 'cors',
+          redirect: 'follow'
+        });
         const result = await response.json();
         if (result.status === 'success' && Array.isArray(result.data)) {
           return result.data;
@@ -95,6 +99,8 @@ class BalloonApi {
       try {
         const response = await fetch(this.gasUrl, {
           method: 'POST',
+          mode: 'cors',
+          redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
@@ -136,6 +142,8 @@ class BalloonApi {
       try {
         const response = await fetch(this.gasUrl, {
           method: 'POST',
+          mode: 'cors',
+          redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
@@ -176,6 +184,8 @@ class BalloonApi {
       try {
         const response = await fetch(this.gasUrl, {
           method: 'POST',
+          mode: 'cors',
+          redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
